@@ -9,21 +9,37 @@ const Todo = () => {
   const handleAddTodo = () => {
     setTodoList((prevTodo) => [
       ...prevTodo,
-      {id : nextId.current, text: text, isDone: false}
+      {id : nextId.current, text: text, isDone: false, isEdit: false}
     ]);
     setText("");
     nextId.current += 1;
-  }
+  };
+
+  const toggleEdit = (id) => {
+    const newTodoList = todoList.map((todo) =>
+      todo.id === id ? {...todo, isEdit: !todo.isEdit} : todo
+    );
+
+    setTodoList(newTodoList);
+  };
+
+  const handleEdit = (e, id) => {
+    const newTodoList = todoList.map((todo) =>
+      todo.id === id ? {...todo, text: [e.target.value]} : todo
+    );
+
+    setTodoList(newTodoList);
+  };
 
   const handleDelete = (id) => {
     const newTodoList = todoList.filter((todo) => todo.id !== id);
     setTodoList(newTodoList);
-  }
+  };
 
   const handleSubmit = (e) => {
     e.preventDefault();
     handleAddTodo();
-  }
+  };
 
   const handleIsDone = (e, id) => {
     const isDone = e.target.checked;
@@ -31,8 +47,8 @@ const Todo = () => {
       todo.id === id ? { ...todo, isDone } : todo
     );
 
-    setTodoList(newTodoList)
-  }
+    setTodoList(newTodoList);
+  };
 
   return (
     <Container>
@@ -47,7 +63,7 @@ const Todo = () => {
         </InputWrapper>
       </form>
       <List>
-        {todoList.map(({ id, text, isDone }) => (
+        {todoList.map(({ id, text, isDone, isEdit }) => (
           <Item key={id} >
             <label>
               <Checkbox
@@ -55,9 +71,18 @@ const Todo = () => {
                 checked={isDone}
                 onChange={(e) => handleIsDone(e, id)}
               />
-              <Content isDone={isDone}>{text}</Content>
+              {isEdit
+              ?
+                <InputText
+                  onChange={(e) => handleEdit(e, id)}
+                  value={text}
+                />
+              :
+                <Content isDone={isDone}>{text}</Content>
+              }
             </label>
-            <BtnDelete onClick={() => handleDelete(todo.id)}>삭제</BtnDelete>
+            <button onClick={() => toggleEdit(id)}>{isEdit ? "수정완료" : "수정"}</button>
+            <button onClick={() => handleDelete(id)}>삭제</button>
           </Item>
         ))
         }
@@ -118,7 +143,7 @@ const Content = styled.div`
   }
 
 `;
-const BtnDelete = styled.button``;
+const button = styled.button``;
 
 
 
